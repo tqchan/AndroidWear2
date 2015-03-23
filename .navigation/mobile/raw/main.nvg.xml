@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<navigationModel
+  ns = "http://schemas.android.com?import=com.android.tools.idea.editors.navigation.model.*">
+  <locations  
+    class = "java.util.ArrayList">
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "com.example.taku.androidwear2.MainActivity"/>
+      <point      
+        x = "420"      
+        y = "37"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.MenuState"      
+        className = "com.example.taku.androidwear2.MainActivity"/>
+      <point      
+        x = "1985"      
+        y = "37"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "com.example.taku.androidwear2.NotificationActivity"/>
+      <point      
+        x = "351"      
+        y = "2156"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.MenuState"      
+        className = "com.example.taku.androidwear2.NotificationActivity"/>
+      <point      
+        x = "1932"      
+        y = "2156"/>
+    </statePointEntry>
+  </locations>
+</navigationModel>
