@@ -1,5 +1,6 @@
 package com.example.taku.androidwear2;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -12,10 +13,19 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 import static android.view.View.OnClickListener;
 
@@ -120,15 +130,34 @@ public class DataActivity extends ActionBarActivity implements GoogleApiClient.C
     }
 //<<カウント
 
+//メッセージ送信>>
     private void sendMessage() {
+        Collection<String> nodes = getNodes();
+        for (String node : nodes) {
+            MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node, START_ACTIVITY_PATH, null).await();
+            if (!result.getStatus().isSuccess()) {
+                Log.e(TAG, "ERROR: failed to send message: " + result.getStatus());
+            }
+        }
+    }
+//<<メッセージ送信
+
+//ノード取得
+    private Collection<String> getNodes() {
+        HashSet<String> results = new HashSet<String>();
+        NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+        for (Node node : nodes.getNodes()) {
+            results.add(node.getId());
+        }
+        return results;
     }
 
-//ノード取得>>
+//ローカルノード取得>>
     private String getLocalNodeId() {
         NodeApi.GetLocalNodeResult nodesResult = Wearable.NodeApi.getLocalNode(mGoogleApiClient).await();
         return nodesResult.getNode().getId();
     }
-//<<ノード取得
+//<<ローカルノード取得
 
 
 
@@ -151,8 +180,23 @@ public class DataActivity extends ActionBarActivity implements GoogleApiClient.C
     }
 //<<接続
 
+//リストア>>
     private void restore() {
+        String localNodeId = getLocalNodeId();
+        Uri uri = new Uri.Builder().scheme(PutDataRequest.WEAR_URI_SCHEME).authority(localNodeId).path(COUNT_PATH).build();
+        Wearable.DataApi.getDataItem(mGoogleApiClient, uri).setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+            @Override
+            public void onResult(DataApi.DataItemResult dataItemResult) {
+                DataItem dataItem = dataItemResult.getDataItem();
+                if (dataItem != null) {
+                    DataMap dataMap = DataMapItem.fromDataItem(dataItemResult.getDataItem()).getDataMap();
+                    count = dataMap.getInt(COUNT_KEY);
+                    Log.d(TAG, "restore count:" + count);
+                }
+            }
+        });
     }
+//<<リストア
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
