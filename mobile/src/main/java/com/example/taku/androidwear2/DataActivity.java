@@ -9,6 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import static android.view.View.OnClickListener;
@@ -98,13 +104,33 @@ public class DataActivity extends ActionBarActivity implements GoogleApiClient.C
     };
 //<<ボタン
 
-
+//>>カウント
     private void Count() {
-
+        PutDataMapRequest dataMapRequest = PutDataMapRequest.create(COUNT_PATH);
+        dataMapRequest.getDataMap().putInt(COUNT_KEY, ++count);
+        PutDataRequest request = dataMapRequest.asPutDataRequest();
+        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi
+                .putDataItem(mGoogleApiClient, request);
+        pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+            @Override
+            public void onResult(DataApi.DataItemResult dataItemResult) {
+                Log.d(TAG, "count up:" + count);
+            }
+        });
     }
+//<<カウント
 
     private void sendMessage() {
     }
+
+//ノード取得>>
+    private String getLocalNodeId() {
+        NodeApi.GetLocalNodeResult nodesResult = Wearable.NodeApi.getLocalNode(mGoogleApiClient).await();
+        return nodesResult.getNode().getId();
+    }
+//<<ノード取得
+
+
 
 //接続>>
     @Override
